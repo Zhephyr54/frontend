@@ -36,6 +36,11 @@ export interface DataEntryFlowProgress {
   };
 }
 
+export interface TranslationFieldMapping {
+  translation_key: string;
+  description_placeholders?: Record<string, string>;
+}
+
 export interface DataEntryFlowStepForm {
   type: "form";
   flow_id: string;
@@ -46,6 +51,7 @@ export interface DataEntryFlowStepForm {
   description_placeholders?: Record<string, string>;
   last_step: boolean | null;
   preview?: string;
+  translation_field_mappings?: Record<string, TranslationFieldMapping>;
   translation_domain?: string;
 }
 
@@ -126,3 +132,18 @@ export const subscribeDataEntryFlowProgress = (
     callback,
     "data_entry_flow_progress_update"
   );
+
+export const getTranslationFieldKey = (
+  key: string,
+  step: DataEntryFlowStepForm,
+): string =>
+  step.translation_field_mappings?.[key]?.translation_key ?? key;
+
+export const getTranslationFieldMergedPlaceholders = (
+  key: string,
+  step: DataEntryFlowStepForm,
+): Record<string, string> => ({
+    ...step.description_placeholders ?? {},
+    ...step.translation_field_mappings?.[key]?.description_placeholders ?? {}
+  })
+
